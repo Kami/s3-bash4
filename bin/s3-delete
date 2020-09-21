@@ -20,6 +20,7 @@ set -euo pipefail
 readonly PROJECT_PATH=$( cd $(dirname $0) ; cd ../; pwd -P )
 readonly SCRIPT_NAME="$(basename $0)"
 readonly METHOD="DELETE"
+readonly IF_MATCH_ETAG=""
 
 # Includes
 source ${PROJECT_PATH}/lib/s3-common.sh

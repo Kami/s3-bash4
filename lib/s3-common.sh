@@ -241,12 +241,21 @@ performRequest() {
   if [[ ${METHOD} == "PUT" ]]; then
     cmd+=("-T" "${FILE_TO_UPLOAD}")
   fi
-  cmd+=("-X" "${METHOD}")
+
+  if [[ ${METHOD} == "HEAD" ]]; then
+    cmd+=("--head")
+  else
+    cmd+=("-X" "${METHOD}")
+  fi
 
   if [[ ${METHOD} == "PUT" && ! -z "${CONTENT_TYPE}" ]]; then
     cmd+=("-H" "Content-Type: ${CONTENT_TYPE}")
     headers+="content-type:${CONTENT_TYPE}\n"
     headerList+="content-type;"
+  fi
+
+  if [[ ! -z "${IF_MATCH_ETAG}" ]]; then
+    cmd+=("-H" "If-Match: ${IF_MATCH_ETAG}")
   fi
 
   cmd+=("-H" "Host: ${host}")

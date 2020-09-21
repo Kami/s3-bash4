@@ -19,8 +19,8 @@ set -euo pipefail
 
 readonly PROJECT_PATH=$( cd $(dirname $0) ; cd ../; pwd -P )
 readonly SCRIPT_NAME="$(basename $0)"
-readonly METHOD="GET"
-readonly IF_MATCH_ETAG=""
+readonly METHOD="HEAD"
+IF_MATCH_ETAG=""
 
 # Includes
 source ${PROJECT_PATH}/lib/s3-common.sh
@@ -78,6 +78,7 @@ parseCommandLine() {
   # Parse options
   local remaining=
   local secretKeyFile=
+  local ifMatchEtag=
   while [[ $# > 0 ]]; do
     local key="$1"
     case ${key} in
@@ -90,6 +91,7 @@ parseCommandLine() {
       -k|--key)        assertArgument $@; AWS_ACCESS_KEY_ID=$2; shift;;
       -s|--secret)     assertArgument $@; secretKeyFile=$2; shift;;
       -t|--token)      assertArgument $@; AWS_SECURITY_TOKEN=$2; shift;;
+      --if-match-etag) assertArgument $@; ifMatchEtag=$2; shift;;
       -*)              err "Unknown option $1"
                        printUsageAndExitWith ${INVALID_USAGE_EXIT_CODE};;
       *)               remaining="${remaining} \"${key}\"";;
@@ -127,6 +129,10 @@ parseCommandLine() {
     printUsageAndExitWith ${INVALID_USAGE_EXIT_CODE}
   fi
 
+  if ! [[ -z "${ifMatchEtag}" ]]; then
+    IF_MATCH_ETAG=${ifMatchEtag}
+  fi
+
   # Freeze globals
   readonly AWS_REGION
   readonly AWS_ACCESS_KEY_ID
@@ -135,6 +141,7 @@ parseCommandLine() {
   readonly DEBUG
   readonly VERBOSE
   readonly INSECURE
+  readonly IF_MATCH_ETAG
 }
 
 ##
